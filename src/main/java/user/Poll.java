@@ -5,25 +5,20 @@ import java.util.ArrayList;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.sun.istack.internal.NotNull;
 
 public class Poll {
 	
 	private String id;
 	
-	@NotNull
 	@NotEmpty
 	private String question;
 	
-	@NotNull
 	@NotEmpty
 	private String started_at;
 	
-	@NotNull
 	@NotEmpty
 	private String expired_at;
 	
-	@NotNull
 	@NotEmpty
 	private ArrayList<String> choice=new ArrayList<String>();
 	
