@@ -21,9 +21,9 @@ public class MController {
 	@ExceptionHandler(Exception.class)
 	@ResponseBody
 	public ResponseEntity<Moderator> addModerator(@RequestBody Moderator mod,
-			Exception e , @RequestHeader(value = "Authorization") String auth) {
+			Exception e /*, @RequestHeader(value = "Authorization") String auth*/) {
 
-		if (Authenticate.isValid(auth)) {
+		/*if (Authenticate.isValid(auth)) {*/
 			if (mod.getName() == null || mod.getName().isEmpty()) {
 				errMsg = "Name field cannot be empty. Please provide name";
 				e.setExceptionMsg(errMsg);
@@ -51,12 +51,12 @@ public class MController {
 				modList.put(addMod.getId(), addMod);
 				return new ResponseEntity<Moderator>(addMod, HttpStatus.CREATED);
 			}
-		} else {
+		/*} else {
 
 			return new ResponseEntity("This can be accesed by moderator only",
 					HttpStatus.BAD_REQUEST);
 		}
-	}
+*/	}
 
 	/* View Moderator */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
