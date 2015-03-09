@@ -93,14 +93,23 @@ public class PController {
 
 	/* Delete Poll */
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@RequestMapping(value = "api/v1/moderators/{moderator_id}/polls/{poll_id}", method = RequestMethod.DELETE)
 	@ResponseStatus(HttpStatus.NO_CONTENT)
-	public void deletePoll(@PathVariable("poll_id") String pollId,
-			@PathVariable("moderator_id") Integer modId) {
-
+	public ResponseEntity deletePoll(@PathVariable("poll_id") String pollId,
+			@PathVariable("moderator_id") Integer modId,
+			@RequestHeader(value = "Authorization") String auth) {
+		if (Authenticate.isValid(auth)) {
 		Moderator m = MController.getModerator(modId);
 		m.deleteModeratorPoll(pollId);
 		pollList.remove(pollId);
+		return new ResponseEntity(HttpStatus.NO_CONTENT );
+	} else {
+
+		return new ResponseEntity("This can be accesed by moderator only",
+				HttpStatus.BAD_REQUEST);
+	}
+
 	}
 
 	/*------------------------------------Vote Poll ---------------------------------------*/
