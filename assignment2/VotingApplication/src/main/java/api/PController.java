@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,19 +24,20 @@ import user.Poll;
 
 import com.fasterxml.jackson.annotation.JsonView;
 
+
 @RestController
 public class PController {
 	@Autowired
 	private ModeratorRepo modRepo;
 
-	//private static final HashMap<String, Poll> pollList = new HashMap<String, Poll>();
-
 	/* Create New Poll in Moderator List */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "api/v1/moderators/{moderator_id}/polls", method = RequestMethod.POST)
+	@RequestMapping(value = "api/v1/moderators/{moderator_id}/polls", 
+					method = RequestMethod.POST,
+					headers = "content-type=application/json")
 	@JsonView(DisplayResult.withoutResults.class)
 	public ResponseEntity<Poll> createPoll(
-			@PathVariable("moderator_id") Integer modId, @RequestBody Poll p,
+			@PathVariable("moderator_id") Integer modId,@Valid @RequestBody Poll p,
 			@RequestHeader(value = "Authorization") String auth) {
 		if (Authenticate.isValid(auth)) {
 			Moderator m = modRepo.findById(modId);
@@ -42,7 +45,6 @@ public class PController {
 			generatePollId(newPoll, modId);
 			m.putPollInList(newPoll);
 			modRepo.save(m);
-			//pollList.putIfAbsent(newPoll.getId(), newPoll);
 			return new ResponseEntity<Poll>(newPoll, HttpStatus.CREATED);
 		} else {
 
@@ -55,12 +57,13 @@ public class PController {
 	/* View Poll without Results */
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "api/v1/polls/{poll_id}", method = RequestMethod.GET)
+	@RequestMapping(value = "api/v1/polls/{poll_id}", 
+					method = RequestMethod.GET,
+					headers = "content-type=application/json")
 	@JsonView(DisplayResult.withoutResults.class)
 	public ResponseEntity viewPollWithoutResult(
 			@PathVariable("poll_id") String pollId) {
-		//Poll viewPoll = getPoll(pollId);
-		if(getPollFromModerator(pollId).isEmpty()||getPollFromModerator(pollId)==null)
+			if(getPollFromModerator(pollId).isEmpty()||getPollFromModerator(pollId)==null)
 			return new ResponseEntity("Poll does not exist", HttpStatus.BAD_REQUEST);
 		else
 		return new ResponseEntity(getPollFromModerator(pollId), HttpStatus.OK);
@@ -70,14 +73,15 @@ public class PController {
 	/* View Poll with Result */
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@RequestMapping(value = "api/v1/moderators/{moderator_id}/polls/{poll_id}", method = RequestMethod.GET)
+	@RequestMapping(value = "api/v1/moderators/{moderator_id}/polls/{poll_id}", 
+					method = RequestMethod.GET,
+					headers = "content-type=application/json")
 	@JsonView(DisplayResult.withResults.class)
 	public ResponseEntity viewPollWithResult(
 			@PathVariable("poll_id") String pollId,
 			@PathVariable("moderator_id") Integer modId,
 			@RequestHeader(value = "Authorization") String auth) {
 		if (Authenticate.isValid(auth)) {
-			//Moderator m = MController.getModerator(modId);
 			Moderator mod = modRepo.findById(modId);
 			if(mod.getModeratorPoll(pollId)==null)
 			return new ResponseEntity("Poll does not exist", HttpStatus.BAD_REQUEST);
@@ -94,13 +98,14 @@ public class PController {
 	/* List Polls */
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "api/v1/moderators/{moderator_id}/polls", method = RequestMethod.GET)
+	@RequestMapping(value = "api/v1/moderators/{moderator_id}/polls", 
+					method = RequestMethod.GET,
+					headers = "content-type=application/json")
 	@JsonView(DisplayResult.withResults.class)
 	public ResponseEntity<ArrayList<Poll>> listAllPollsGet(
 			@PathVariable("moderator_id") Integer modId,
 			@RequestHeader(value = "Authorization") String auth) {
 		if (Authenticate.isValid(auth)) {
-			//Moderator getMod = MController.getModerator(modId);
 			Moderator getMod = modRepo.findById(modId);
 			return new ResponseEntity<ArrayList<Poll>>(getMod.getPollList(),
 					HttpStatus.OK);
@@ -115,7 +120,8 @@ public class PController {
 	/* Delete Poll */
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@RequestMapping(value = "api/v1/moderators/{moderator_id}/polls/{poll_id}", method = RequestMethod.DELETE)
+	@RequestMapping(value = "api/v1/moderators/{moderator_id}/polls/{poll_id}", 
+					method = RequestMethod.DELETE)
 	public ResponseEntity deletePoll(@PathVariable("poll_id") String pollId,
 			@PathVariable("moderator_id") Integer modId,
 			@RequestHeader(value = "Authorization") String auth) {
@@ -131,13 +137,13 @@ public class PController {
 	}}
 	
 	/* Vote Poll */
+	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@RequestMapping(value = "api/v1/polls/{poll_id}", method = RequestMethod.PUT)
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	@JsonView(DisplayResult.withResults.class)
 	public ResponseEntity votePoll(@PathVariable("poll_id") String pollId,
 			@RequestParam(value = "choice") Integer choice) {
-		//Poll votePol = getPoll(pollId);
 		List<Moderator> modList = new ArrayList<Moderator>();
 		modList=modRepo.findAll();
 		for(Moderator m : modList)

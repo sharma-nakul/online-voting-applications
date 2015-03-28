@@ -2,25 +2,42 @@ package user;
 
 import java.util.ArrayList;
 
+import javax.validation.constraints.NotNull;
+
+import org.hibernate.validator.constraints.NotEmpty;
+
 import com.fasterxml.jackson.annotation.JsonView;
 
 import api.DisplayResult;
 
 public class Poll {
-	
+
 	@JsonView(DisplayResult.withoutResults.class)
 	private String id;
+	
+	@NotNull
+	@NotEmpty
 	@JsonView(DisplayResult.withoutResults.class)
 	private String question;
+	
+	@NotNull
+	@NotEmpty
 	@JsonView(DisplayResult.withoutResults.class)
 	private String started_at;
+	
+	@NotNull
+	@NotEmpty
 	@JsonView(DisplayResult.withoutResults.class)
 	private String expired_at;
+	
+	@NotNull
+	@NotEmpty
 	@JsonView(DisplayResult.withoutResults.class)
 	private ArrayList<String> choice;
+	
 	@JsonView(DisplayResult.withResults.class)
 	private ArrayList<Integer> results;
-	//private static int nextId = 54321;
+
 
 	public Poll(String question, String started_at, String expired_at,
 			ArrayList<String> choice) {
@@ -32,11 +49,10 @@ public class Poll {
 
 		// Initialize results for all choices with zero
 		results = new ArrayList<Integer>();
-		int i=0;
-		while(i<choice.size())
-		{
+		int i = 0;
+		while (i < choice.size()) {
 			results.add(new Integer(0));
-			i+=1;
+			i += 1;
 		}
 
 	}
@@ -50,8 +66,8 @@ public class Poll {
 		return id;
 	}
 
-	public void setId(String id) {	
-		this.id=id;
+	public void setId(String id) {
+		this.id = id;
 	}
 
 	public String getQuestion() {

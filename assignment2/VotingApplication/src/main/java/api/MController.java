@@ -1,13 +1,20 @@
 package api;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+
+import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import user.Moderator;
 
@@ -16,16 +23,16 @@ public class MController {
 
 	@Autowired
 	private ModeratorRepo repo;
-
-	private static HashMap<Integer, Moderator> modList = new HashMap<Integer, Moderator>();
+	
 	private String errMsg;
 
 	/* Add Moderator */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@RequestMapping(value = "/api/v1/moderators", method = RequestMethod.POST)
-	@ExceptionHandler(Exception.class)
+	@RequestMapping(value = "/api/v1/moderators", 
+					method = RequestMethod.POST,
+					headers = "content-type=application/json")
 	@ResponseBody
-	public ResponseEntity<Moderator> addModerator(@RequestBody Moderator mod) {
+	public ResponseEntity<Moderator> addModerator(@Valid @RequestBody Moderator mod) {
 
 		if (mod.getName() == null || mod.getName().isEmpty()) {
 			errMsg = "Name field cannot be empty. Please provide name";
@@ -47,15 +54,15 @@ public class MController {
 					mod.getPassword());
 			generateModeratorId(addMod);
 			repo.save(addMod);
-			// modList.put(addMod.getId(), addMod);
 			return new ResponseEntity<Moderator>(addMod, HttpStatus.CREATED);
 		}
 	}
 
 	/* View Moderator */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@RequestMapping(value = "api/v1/moderators/{moderator_id}", method = RequestMethod.GET)
-	@ExceptionHandler(Exception.class)
+	@RequestMapping(value = "api/v1/moderators/{moderator_id}", 
+					method = RequestMethod.GET,
+					headers = "content-type=application/json")
 	public ResponseEntity<Moderator> viewModerator(@PathVariable("moderator_id") Integer mod_id,@RequestHeader(value = "Authorization") String auth) 
 	{
 		if (Authenticate.isValid(auth)) 
@@ -77,11 +84,12 @@ public class MController {
 
 	/* Update Moderator */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@RequestMapping(value = "api/v1/moderators/{moderator_id}", method = RequestMethod.PUT)
-	@ExceptionHandler(Exception.class)
+	@RequestMapping(value = "api/v1/moderators/{moderator_id}", 
+					method = RequestMethod.PUT,
+					headers = "content-type=application/json")
 	@ResponseBody
 	public ResponseEntity<Moderator> updateModerator(
-			@RequestBody Moderator mod,
+			@Valid @RequestBody Moderator mod,
 			@PathVariable("moderator_id") Integer mod_id,
 			@RequestHeader(value = "Authorization") String auth) {
 		if (Authenticate.isValid(auth)) 
@@ -101,7 +109,6 @@ public class MController {
 				updateMod.setEmail(mod.getEmail());
 				updateMod.setPassword(mod.getPassword());
 				repo.save(updateMod);
-			//	modList.put(mod_id, updateMod);
 				return new ResponseEntity<Moderator>(updateMod,
 						HttpStatus.CREATED);
 			}
@@ -127,5 +134,7 @@ public class MController {
 			mod.setId(id+1);	
 		}
 	}
+	
+
 
 }
