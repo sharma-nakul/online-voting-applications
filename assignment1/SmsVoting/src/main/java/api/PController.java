@@ -22,6 +22,7 @@ public class PController {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "api/v1/moderators/{moderator_id}/polls", method = RequestMethod.POST)
 	@JsonView(DisplayResult.withoutResults.class)
+	
 	public ResponseEntity<Poll> createPoll(
 			@PathVariable("moderator_id") Integer modId, @RequestBody Poll p,
 			@RequestHeader(value = "Authorization") String auth) {
