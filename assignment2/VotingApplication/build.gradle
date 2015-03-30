@@ -24,9 +24,9 @@ repositories {
 dependencies {
     compile("org.springframework.boot:spring-boot-starter-web")
     testCompile("junit:junit")
-    compile 'org.springframework.security:spring-security-web:3.2.6.RELEASE'
+    //compile 'org.springframework.security:spring-security-web:3.2.6.RELEASE'
     compile("org.springframework.boot:spring-boot-starter-data-mongodb")
-    //compile("org.springframework.boot:spring-boot-starter-security")
+    compile("org.springframework.boot:spring-boot-starter-security")
 }
 
 task wrapper(type: Wrapper) {

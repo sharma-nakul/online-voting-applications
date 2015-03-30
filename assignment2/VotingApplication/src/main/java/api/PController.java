@@ -31,7 +31,7 @@ public class PController {
 	private ModeratorRepo modRepo;
 
 	/* Create New Poll in Moderator List */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	
 	@RequestMapping(value = "api/v1/moderators/{moderator_id}/polls", 
 					method = RequestMethod.POST,
 					headers = "content-type=application/json")
@@ -39,20 +39,15 @@ public class PController {
 	public ResponseEntity<Poll> createPoll(
 			@PathVariable("moderator_id") Integer modId,@Valid @RequestBody Poll p,
 			@RequestHeader(value = "Authorization") String auth) {
-		if (Authenticate.isValid(auth)) {
+		
 			Moderator m = modRepo.findById(modId);
 			Poll newPoll = new Poll(p.getQuestion(), p.getStarted_at(),	p.getExpired_at(), p.getChoice());
 			generatePollId(newPoll, modId);
 			m.putPollInList(newPoll);
 			modRepo.save(m);
 			return new ResponseEntity<Poll>(newPoll, HttpStatus.CREATED);
-		} else {
-
-			return new ResponseEntity("This can be accesed by moderator only",
-					HttpStatus.BAD_REQUEST);
-		}
-
-	}
+		} 
+	
 
 	/* View Poll without Results */
 
@@ -79,43 +74,34 @@ public class PController {
 	@JsonView(DisplayResult.withResults.class)
 	public ResponseEntity viewPollWithResult(
 			@PathVariable("poll_id") String pollId,
-			@PathVariable("moderator_id") Integer modId,
-			@RequestHeader(value = "Authorization") String auth) {
-		if (Authenticate.isValid(auth)) {
+			@PathVariable("moderator_id") Integer modId) {
+		
 			Moderator mod = modRepo.findById(modId);
 			if(mod.getModeratorPoll(pollId)==null)
 			return new ResponseEntity("Poll does not exist", HttpStatus.BAD_REQUEST);
 			else
 			return new ResponseEntity(mod.getModeratorPoll(pollId), HttpStatus.OK);
 
-		} else {
-
-			return new ResponseEntity("This can be accesed by moderator only",
-					HttpStatus.BAD_REQUEST);
-		}
-	}
+		} 
 	
 	/* List Polls */
 	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@RequestMapping(value = "api/v1/moderators/{moderator_id}/polls", 
 					method = RequestMethod.GET,
 					headers = "content-type=application/json")
 	@JsonView(DisplayResult.withResults.class)
 	public ResponseEntity<ArrayList<Poll>> listAllPollsGet(
-			@PathVariable("moderator_id") Integer modId,
-			@RequestHeader(value = "Authorization") String auth) {
-		if (Authenticate.isValid(auth)) {
+			@PathVariable("moderator_id") Integer modId) {
+		
 			Moderator getMod = modRepo.findById(modId);
+			if(getMod==null)
+				return new ResponseEntity("No poll created by this moderator", HttpStatus.BAD_REQUEST);
+				else
 			return new ResponseEntity<ArrayList<Poll>>(getMod.getPollList(),
 					HttpStatus.OK);
-		} else {
-
-			return new ResponseEntity("This can be accesed by moderator only",
-					HttpStatus.BAD_REQUEST);
-		}
-
-	}
+		} 
+	 
 
 	/* Delete Poll */
 	
@@ -123,18 +109,13 @@ public class PController {
 	@RequestMapping(value = "api/v1/moderators/{moderator_id}/polls/{poll_id}", 
 					method = RequestMethod.DELETE)
 	public ResponseEntity deletePoll(@PathVariable("poll_id") String pollId,
-			@PathVariable("moderator_id") Integer modId,
-			@RequestHeader(value = "Authorization") String auth) {
-		if (Authenticate.isValid(auth)) {
+			@PathVariable("moderator_id") Integer modId) {
+		
 		Moderator m = modRepo.findById(modId);
 		m.deleteModeratorPoll(pollId);
 		modRepo.save(m);
 		return new ResponseEntity("Poll Deleted", HttpStatus.NO_CONTENT );
-	} else {
-
-		return new ResponseEntity("This can be accesed by moderator only",
-				HttpStatus.BAD_REQUEST);
-	}}
+	} 
 	
 	/* Vote Poll */
 	

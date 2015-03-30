@@ -10,11 +10,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+
 
 import user.Moderator;
 
@@ -25,7 +25,8 @@ public class MController {
 	private ModeratorRepo repo;
 	
 	private String errMsg;
-
+	
+	
 	/* Add Moderator */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@RequestMapping(value = "/api/v1/moderators", 
@@ -48,7 +49,7 @@ public class MController {
 			errMsg = "Password cannot be empty. Please provide password";
 			return new ResponseEntity(errMsg, HttpStatus.BAD_REQUEST);
 		}
-
+		
 		else {
 			Moderator addMod = new Moderator(mod.getName(), mod.getEmail(),
 					mod.getPassword());
@@ -63,24 +64,25 @@ public class MController {
 	@RequestMapping(value = "api/v1/moderators/{moderator_id}", 
 					method = RequestMethod.GET,
 					headers = "content-type=application/json")
-	public ResponseEntity<Moderator> viewModerator(@PathVariable("moderator_id") Integer mod_id,@RequestHeader(value = "Authorization") String auth) 
+	public ResponseEntity<Moderator> viewModerator(@PathVariable("moderator_id") Integer mod_id) 
 	{
-		if (Authenticate.isValid(auth)) 
-		{
-			if (mod_id == null) 
+			if (mod_id == null ) 
 			{
 				errMsg = "Moderator Id not provided";
 				return new ResponseEntity(errMsg, HttpStatus.BAD_REQUEST);
 			}
 
-			else
+			else{
+				if (repo.findById(mod_id)==null)
+					return new ResponseEntity("Moderator does not exist", HttpStatus.BAD_REQUEST);
+				else
 				return new ResponseEntity<Moderator>(repo.findById(mod_id),	HttpStatus.OK);
-		} else 
-		{
-			return new ResponseEntity("This can be accesed by moderator only",HttpStatus.BAD_REQUEST);
-		}
+			}
+				
+				
+		} 
 
-	}
+	
 
 	/* Update Moderator */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -90,11 +92,9 @@ public class MController {
 	@ResponseBody
 	public ResponseEntity<Moderator> updateModerator(
 			@Valid @RequestBody Moderator mod,
-			@PathVariable("moderator_id") Integer mod_id,
-			@RequestHeader(value = "Authorization") String auth) {
-		if (Authenticate.isValid(auth)) 
-		{
-			if (mod.getEmail() == null || mod.getEmail().isEmpty()) {
+			@PathVariable("moderator_id") Integer mod_id) {
+		
+		if (mod.getEmail() == null || mod.getEmail().isEmpty()) {
 				errMsg = "Email field cannot be empty. Please provide email";
 				return new ResponseEntity(errMsg, HttpStatus.BAD_REQUEST);
 			}
@@ -103,7 +103,10 @@ public class MController {
 				errMsg = "Password cannot be empty. Please provide password";
 				return new ResponseEntity(errMsg, HttpStatus.BAD_REQUEST);
 			}
-
+			else if (repo.findById(mod_id)==null)
+			{	errMsg ="Moderator does not exist";
+				return new ResponseEntity(errMsg, HttpStatus.BAD_REQUEST);	
+			}
 			else {
 				Moderator updateMod = repo.findById(mod_id);
 				updateMod.setEmail(mod.getEmail());
@@ -113,13 +116,8 @@ public class MController {
 						HttpStatus.CREATED);
 			}
 		} 
-		else {
-
-			return new ResponseEntity("This can be accesed by moderator only",
-					HttpStatus.BAD_REQUEST);
-		}
-
-	}
+		
+	
 	
 	
 	private void generateModeratorId(Moderator mod)
