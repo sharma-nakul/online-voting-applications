@@ -24,7 +24,7 @@ public class KafkaProducer {
     public void send(String topic, String msg) {
         KeyedMessage<String, String> data = new KeyedMessage<>(topic, msg);
         producer.send(data);
-        logger.info(msg);
+       // logger.info(msg);
         producer.close();
     }
 }

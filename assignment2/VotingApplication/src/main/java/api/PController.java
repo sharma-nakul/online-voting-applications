@@ -170,69 +170,12 @@ public class PController {
 
 // ---------------------------------Extra Code : Assignment 2------------------------------------------------
 
-    @RequestMapping(value = "api/v1/moderators/show_polls",
+    @RequestMapping(value = "api/v1/moderators/expired_polls",
             method = RequestMethod.GET)
     @JsonView(DisplayResult.withResults.class)
     public ResponseEntity getPollList() {
-        List<Moderator> modRepoAll = modRepo.findAll();
-        ConcurrentHashMap<String, ArrayList<String>> allPolls = new ConcurrentHashMap<>();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-        String myInfo = "010090730";
-
-        try {
-            if (modRepoAll == null)
-                return new ResponseEntity("Moderator returning null", HttpStatus.BAD_REQUEST);
-            else {
-                for (Moderator m : modRepoAll) {
-                    String key = m.getEmail();
-                    ArrayList<String> tempMsg = new ArrayList<>();
-                    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss");
-                    LocalDateTime ldt = LocalDateTime.now();
-                    Date currentDate = sdf.parse(ldt.format(dtf));
-                    if (m.getPollList() != null) {
-                        for (Poll p : m.getPollList()) {
-                            ArrayList<String> pollChoice = p.getChoice();
-                            String time = (p.getExpired_at().substring(0, 10)) + " " + (p.getExpired_at().substring(11, 19));
-                            ArrayList<Integer> pollResult = p.getResults();
-                            Date expiredDate = sdf.parse(time);
-                            if (expiredDate.before(currentDate) && p.getFlag() == 0) {
-                                p.setFlag(1);
-                                String temp = m.getEmail() + ":" + ":" + myInfo + ":Poll Result[" + pollChoice.get(0) + "=" + pollResult.get(0) + "," + pollChoice.get(1) + "=" + pollResult.get(1) + "]";
-                                tempMsg.add(temp);
-                                modRepo.save(m);
-                            }
-                        }
-                        allPolls.put(key, tempMsg);
-                    } else
-                        allPolls.put(key, null);
-                }
-            }
-            for (HashMap.Entry<String, ArrayList<String>> entry : allPolls.entrySet()) {
-                String key = entry.getKey();
-                ArrayList<String> pollValue = entry.getValue();
-                if (pollValue.isEmpty() || pollValue == null)
-                    allPolls.remove(key, pollValue);
-            }
-        } catch (NullPointerException e) {
-            logger.info(e.getMessage());
-            //logger.info("No Poll Found");
-            return new ResponseEntity("No Poll Found, NullPointException thrown", HttpStatus.BAD_REQUEST);
-        } catch (IndexOutOfBoundsException e) {
-            logger.info(e.getMessage());
-            //logger.info("IndexOutOfBoundsException");
-            return new ResponseEntity("IndexOutOfBound Exception thrown", HttpStatus.BAD_REQUEST);
-        } catch (NoSuchElementException e) {
-            logger.info(e.getMessage());
-            //logger.info("No such element exception generated");
-            return new ResponseEntity("No such element exception generated", HttpStatus.BAD_REQUEST);
-        } catch (ParseException e) {
-            logger.info(e.getMessage());
-            return new ResponseEntity("Cannot parse date, ParseException generated", HttpStatus.BAD_REQUEST);
-        }
-        if (allPolls.isEmpty() || allPolls == null)
-            return new ResponseEntity<>("There is no poll expired recently", HttpStatus.OK);
-        else
-            return new ResponseEntity<>(allPolls, HttpStatus.OK);
+        ConcurrentHashMap<String, ArrayList<String>> expiredPolls = getExpiredPoll();
+            return new ResponseEntity<>(expiredPolls, HttpStatus.OK);
     }
 
 
@@ -260,20 +203,19 @@ public class PController {
                             Date expiredDate = sdf.parse(time);
                             if (expiredDate.before(currentDate) && p.getFlag() == 0) {
                                 p.setFlag(1);
-                                String temp = m.getEmail() + ":" + ":" + myInfo + ":Poll Result[" + pollChoice.get(0) + "=" + pollResult.get(0) + "," + pollChoice.get(1) + "=" + pollResult.get(1) + "]";
+                                String temp = m.getEmail() + ":" + myInfo + ":Poll Result[" + pollChoice.get(0) + "=" + pollResult.get(0) + "," + pollChoice.get(1) + "=" + pollResult.get(1) + "]";
                                 tempMsg.add(temp);
                                 modRepo.save(m);
                             }
                         }
                         allPolls.put(key, tempMsg);
-                    } else
-                        allPolls.put(key, null);
+                    }
                 }
             }
             for (HashMap.Entry<String, ArrayList<String>> entry : allPolls.entrySet()) {
                 String key = entry.getKey();
                 ArrayList<String> pollValue = entry.getValue();
-                if (pollValue.isEmpty() || pollValue == null)
+                if (pollValue.isEmpty())
                     allPolls.remove(key, pollValue);
             }
         } catch (NullPointerException e) {

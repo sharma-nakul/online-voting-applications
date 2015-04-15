@@ -24,13 +24,12 @@ public class ScheduledTasks {
         ConcurrentHashMap<String, ArrayList<String>> expiredPolls = pController.getExpiredPoll();
         ArrayList<String> pollMessageList = new ArrayList<>();
         try {
-            if (expiredPolls.isEmpty() || expiredPolls == null)
+            if (expiredPolls.isEmpty())
                 logger.info("There is no poll expired recently!!");
             else {
                 for (ArrayList<String> value : expiredPolls.values()) {
                     for (String msg : value) {
                         pollMessageList.add(msg);
-                        logger.info(msg);
                     }
                 }
             }
@@ -43,18 +42,18 @@ public class ScheduledTasks {
 
     @Scheduled(fixedRate = 5000)
     public void reportExpiredPolls() {
-        //KafkaProducer kafka = new KafkaProducer("localhost:2181");
-        String topic = "cmpe273-topic";
         try {
             ArrayList<String> pollMessageList = getExpiredPolls();
             for (String msg : pollMessageList) {
                 logger.info(msg);
-                //kafka.send(topic, msg);
+                String topic = "cmpe273-topic";
+                KafkaProducer kafka = new KafkaProducer("54.149.84.25:9092");
+                kafka.send(topic, msg);
             }
         }
         catch (NullPointerException e)
         {
-            logger.info("There is no expired poll found to report on KafKa server");
+            logger.info("NullPointException generated while sending mail to Kafka server");
         }
     }
 }
