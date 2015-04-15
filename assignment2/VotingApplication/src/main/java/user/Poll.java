@@ -1,14 +1,12 @@
 package user;
 
-import java.util.ArrayList;
-
-import javax.validation.constraints.NotNull;
-
+import api.DisplayResult;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import com.fasterxml.jackson.annotation.JsonView;
-
-import api.DisplayResult;
+import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 
 public class Poll {
 
@@ -38,6 +36,7 @@ public class Poll {
 	@JsonView(DisplayResult.withResults.class)
 	private ArrayList<Integer> results;
 
+	private int flag;
 
 	public Poll(String question, String started_at, String expired_at,
 			ArrayList<String> choice) {
@@ -45,21 +44,30 @@ public class Poll {
 		this.question = question;
 		this.started_at = started_at;
 		this.expired_at = expired_at;
-		this.choice = new ArrayList<String>(choice);
+		this.choice = new ArrayList<>(choice);
 
 		// Initialize results for all choices with zero
-		results = new ArrayList<Integer>();
+		results = new ArrayList<>();
 		int i = 0;
 		while (i < choice.size()) {
 			results.add(new Integer(0));
 			i += 1;
 		}
-
 	}
 
 	public Poll() {
-		choice = new ArrayList<String>();
-		results = new ArrayList<Integer>();
+		choice = new ArrayList<>();
+		results = new ArrayList<>();
+		flag=0;
+	}
+
+	@JsonIgnore
+	public int getFlag() {
+		return flag;
+	}
+
+	public void setFlag(int flag) {
+		this.flag = flag;
 	}
 
 	public String getId() {
