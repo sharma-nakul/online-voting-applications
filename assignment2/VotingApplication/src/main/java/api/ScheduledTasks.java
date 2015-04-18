@@ -40,7 +40,7 @@ public class ScheduledTasks {
         return pollMessageList;
     }
 
-    @Scheduled(fixedRate = 5000)
+    @Scheduled(fixedRate = 300000)
     public void reportExpiredPolls() {
         try {
             ArrayList<String> pollMessageList = getExpiredPolls();
@@ -53,7 +53,7 @@ public class ScheduledTasks {
         }
         catch (NullPointerException e)
         {
-            logger.info("NullPointException generated while sending mail to Kafka server");
+            logger.info("NullPointException geneyrated while sending mail to Kafka server");
         }
     }
 }

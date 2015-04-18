@@ -26,7 +26,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class PController {
     private static final Logger logger = Logger.getLogger(PController.class);
     private static ArrayList<Poll> modPollList = null;
-    // private static ArrayList<Poll> expiredPoll = new ArrayList<>();
     private static ArrayList<String> msg;
     @Autowired
     private ModeratorRepo modRepo;
@@ -34,7 +33,6 @@ public class PController {
 
     public PController() {
         msg = new ArrayList<>();
-//        msg=null;
     }
 
     /* Create New Poll in Moderator List */
@@ -170,6 +168,7 @@ public class PController {
 
 // ---------------------------------Extra Code : Assignment 2------------------------------------------------
 
+/*
     @RequestMapping(value = "api/v1/moderators/expired_polls",
             method = RequestMethod.GET)
     @JsonView(DisplayResult.withResults.class)
@@ -177,14 +176,13 @@ public class PController {
         ConcurrentHashMap<String, ArrayList<String>> expiredPolls = getExpiredPoll();
             return new ResponseEntity<>(expiredPolls, HttpStatus.OK);
     }
-
+*/
 
     public ConcurrentHashMap<String, ArrayList<String>> getExpiredPoll() {
         List<Moderator> modRepoAll = modRepo.findAll();
         ConcurrentHashMap<String, ArrayList<String>> allPolls = new ConcurrentHashMap<>();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         String myInfo = "010090730";
-
         try {
             if (modRepoAll == null)
                 logger.info("Moderator returning null");
