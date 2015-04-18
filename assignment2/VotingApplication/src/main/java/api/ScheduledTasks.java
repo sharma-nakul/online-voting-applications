@@ -12,6 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Created by Nakul Sharma on 10-04-2015.
  */
 
+
 @Component
 public class ScheduledTasks {
     private static final Logger logger = Logger.getLogger(ScheduledTasks.class);
