@@ -9,6 +9,13 @@ import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
+ * Class - Checks expired polls in every 5 minutes and email results of expired polls to moderator
+ *
+ * getExpiredPolls - Method returns expired polls only after checking the Database.
+ * If there is no poll expired then it will return null/empty HashMap.
+ *
+ * reportExpiredPoll - Method send email every 5 minutes if expired poll found in database.
+ *
  * Created by Nakul Sharma on 10-04-2015.
  */
 
